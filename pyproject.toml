@@ -37,5 +37,5 @@ preview = true
 quote-style = 'single'
 
 [tool.taskipy.tasks]
-lint = 'ruff check'
-pre_format = 'ruff check --fix'
+lint = 'ruff check .; ruff check . --diff'
+format = 'ruff check . --fix; ruff format .'
