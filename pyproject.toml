@@ -31,6 +31,7 @@ extend-exclude = ['manage.py', '**/migrations/**.py']
 [tool.ruff.lint]
 preview = true
 select = ['I', 'F', 'E', 'W', 'PL', 'PT']
+ignore = ['PLR6301']
 
 [tool.ruff.format]
 preview = true
