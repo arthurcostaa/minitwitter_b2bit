@@ -37,6 +37,7 @@ class CustomUserAdmin(UserAdmin):
         ),
     )
     ordering = ('email',)
+    readonly_fields = ('date_joined',)
 
 
 admin.site.register(CustomUser, CustomUserAdmin)
