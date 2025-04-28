@@ -26,10 +26,11 @@ class CustomUserSerializer(serializers.ModelSerializer):
         password = data.get('password')
         errors = {}
 
-        try:
-            validate_password(password, user)
-        except exceptions.ValidationError as e:
-            errors['password'] = list(e.messages)
+        if password:
+            try:
+                validate_password(password, user)
+            except exceptions.ValidationError as e:
+                errors['password'] = list(e.messages)
 
         if errors:
             raise serializers.ValidationError(errors)
