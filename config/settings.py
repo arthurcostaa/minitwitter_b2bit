@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'drf_spectacular',
     'accounts.apps.AccountsConfig',
 ]
 
@@ -56,7 +57,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': f'django.db.backends.{os.getenv('DATABASE_ENGINE', 'sqlite3')}',
+        'ENGINE': f'django.db.backends.{os.getenv("DATABASE_ENGINE", "sqlite3")}',
         'NAME': os.getenv('DATABASE_NAME', 'db'),
         'USER': os.getenv('DATABASE_USERNAME', 'user'),
         'PASSWORD': os.getenv('DATABASE_PASSWORD', 'password'),
@@ -99,8 +100,16 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAuthenticated',),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'B2BIT - Mini Twitter',
+    'DESCRIPTION': 'Mini Twitter - REST API for a simple social media platform',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
 }
