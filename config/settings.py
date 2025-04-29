@@ -12,7 +12,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 
 DEBUG = os.getenv('DEBUG') == 'True'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split()
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1').split()
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -61,7 +61,7 @@ DATABASES = {
         'USER': os.getenv('DATABASE_USERNAME', 'user'),
         'PASSWORD': os.getenv('DATABASE_PASSWORD', 'password'),
         'HOST': os.getenv('DATABASE_HOST', '127.0.0.1'),
-        'PORT': os.getenv('DATABASE_PORT', 5432),
+        'PORT': os.getenv('DATABASE_PORT', 5432),  # noqa: PLW1508
     }
 }
 

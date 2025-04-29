@@ -17,3 +17,7 @@ RUN pip install poetry && \
     poetry install --only main --no-interaction --no-ansi
 
 COPY . .
+
+EXPOSE 8000
+
+CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3", "--reload"]
