@@ -13,11 +13,10 @@ from rest_framework_simplejwt.views import (
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('schema/', SpectacularAPIView.as_view(), name='schema'),
-    path(
-        'swagger/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger'
-    ),
+    path('swagger/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger'),
     path('redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
     path('accounts/', include('accounts.urls')),
+    path('posts/', include('posts.urls')),
     path('auth/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
