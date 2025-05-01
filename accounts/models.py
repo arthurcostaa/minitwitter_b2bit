@@ -8,6 +8,7 @@ class CustomUser(AbstractUser):
     following = models.ManyToManyField(
         'self', related_name='followers', symmetrical=False
     )
+    likes = models.ManyToManyField('posts.Post', related_name='liked_by')
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
@@ -25,3 +26,14 @@ class CustomUser(AbstractUser):
     def unfollow(self, user):
         if self.is_following(user):
             self.following.remove(user)
+
+    def is_liked(self, post):
+        return self.likes.filter(pk=post.pk).exists()
+
+    def like(self, post):
+        if not self.is_liked(post):
+            self.likes.add(post)
+
+    def unlike(self, post):
+        if self.is_liked(post):
+            self.likes.remove(post)
