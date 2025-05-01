@@ -1,8 +1,11 @@
 import datetime
 
-from rest_framework import viewsets
+from django.shortcuts import get_object_or_404
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
 from .models import Post
 from .permissions import IsOwnerOrReadOnly
@@ -25,3 +28,17 @@ class PostViewSet(viewsets.ModelViewSet):
                 "It's been more than one hour since it was created."
             )
         serializer.save()
+
+    @action(detail=True, methods=['post', 'delete'], url_path='like', url_name='like')
+    def like(self, request, pk=None):
+        post = get_object_or_404(Post, pk=self.kwargs['pk'])
+        current_user = self.request.user
+
+        if request.method == 'POST':
+            current_user.like(post)
+            data = {'detail': 'Post liked successfully'}
+        elif request.method == 'DELETE':
+            current_user.unlike(post)
+            data = {'detail': 'Post unliked successfully'}
+
+        return Response(data, status=status.HTTP_200_OK)
