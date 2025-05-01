@@ -47,5 +47,11 @@ class PostViewSet(viewsets.ModelViewSet):
     def feed(self, request):
         followed_users = request.user.following.all()
         posts = Post.objects.filter(author__in=followed_users).order_by('-created_at')
+
+        page = self.paginate_queryset(posts)
+        if page is not None:
+            serializer = PostSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
         serializer = PostSerializer(posts, many=True)
         return Response(serializer.data)
