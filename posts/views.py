@@ -42,3 +42,10 @@ class PostViewSet(viewsets.ModelViewSet):
             data = {'detail': 'Post unliked successfully'}
 
         return Response(data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['get'], url_path='feed', url_name='feed')
+    def feed(self, request):
+        followed_users = request.user.following.all()
+        posts = Post.objects.filter(author__in=followed_users).order_by('-created_at')
+        serializer = PostSerializer(posts, many=True)
+        return Response(serializer.data)
