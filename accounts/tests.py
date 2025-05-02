@@ -2,6 +2,7 @@ from datetime import date
 
 from django.test import TestCase, TransactionTestCase
 from django.urls import reverse
+from rest_framework import status
 from rest_framework.test import APIClient
 
 from accounts.models import CustomUser
@@ -51,6 +52,64 @@ class CustomUserModelTest(TestCase):
         self.assertFalse(self.user1.is_liked(self.post))
 
 
+class AutheticationViewTest(TestCase):
+    def setUp(self):
+        password = 'GoodMorning#123'
+        self.user = CustomUser.objects.create_user(
+            username='ana', email='ana@email.com', password=password
+        )
+        self.user.clean_password = password
+
+    def test_get_access_and_refresh_token(self):
+        response = self.client.post(
+            reverse('token_obtain_pair'),
+            data={'email': self.user.email, 'password': self.user.clean_password},
+            format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('access', response.json())
+        self.assertIn('refresh', response.json())
+
+    def test_refresh_token(self):
+        response = self.client.post(
+            reverse('token_obtain_pair'),
+            data={'email': self.user.email, 'password': self.user.clean_password},
+            format='json',
+        )
+        refresh_token = response.json().get('refresh')
+        response = self.client.post(
+            reverse('token_refresh'),
+            data={'refresh': refresh_token},
+            format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('access', response.json())
+
+    def test_get_access_token_with_invalid_credentials(self):
+        response = self.client.post(
+            reverse('token_obtain_pair'),
+            data={'email': 'abc@email.com', 'password': 'password'},
+            format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertDictEqual(
+            response.json(),
+            {'detail': 'No active account found with the given credentials'},
+        )
+
+    def test_refresh_token_with_invalid_refresh_token(self):
+        refresh_token = 'InVaLidToKeN'
+        response = self.client.post(
+            reverse('token_refresh'),
+            data={'refresh': refresh_token},
+            format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertDictEqual(
+            response.json(), {'detail': 'Token is invalid', 'code': 'token_not_valid'}
+        )
+
+
 class CustomUserViewSetTest(TransactionTestCase):
     reset_sequences = True
 
@@ -70,7 +129,7 @@ class CustomUserViewSetTest(TransactionTestCase):
             },
             format='json',
         )
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertDictEqual(
             response.json(),
             {
@@ -80,5 +139,5 @@ class CustomUserViewSetTest(TransactionTestCase):
                 'first_name': 'John',
                 'last_name': 'Doe',
                 'date_joined': today,
-            }
+            },
         )
