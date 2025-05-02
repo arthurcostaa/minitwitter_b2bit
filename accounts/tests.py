@@ -1,4 +1,8 @@
-from django.test import TestCase
+from datetime import date
+
+from django.test import TestCase, TransactionTestCase
+from django.urls import reverse
+from rest_framework.test import APIClient
 
 from accounts.models import CustomUser
 from posts.models import Post
@@ -45,3 +49,36 @@ class CustomUserModelTest(TestCase):
 
     def test_user_dont_like_post(self):
         self.assertFalse(self.user1.is_liked(self.post))
+
+
+class CustomUserViewSetTest(TransactionTestCase):
+    reset_sequences = True
+
+    def setUp(self):
+        self.client = APIClient()
+
+    def test_create_new_user(self):
+        today = date.today().isoformat()
+        response = self.client.post(
+            reverse('user-list'),
+            data={
+                'username': 'johndoe',
+                'email': 'johndoe@email.com',
+                'password': 'StrongP4ssw0rd#314',
+                'first_name': 'John',
+                'last_name': 'Doe',
+            },
+            format='json',
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertDictEqual(
+            response.json(),
+            {
+                'id': 1,
+                'username': 'johndoe',
+                'email': 'johndoe@email.com',
+                'first_name': 'John',
+                'last_name': 'Doe',
+                'date_joined': today,
+            }
+        )
