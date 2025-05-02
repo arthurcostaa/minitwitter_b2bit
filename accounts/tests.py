@@ -4,7 +4,7 @@ from accounts.models import CustomUser
 from posts.models import Post
 
 
-class CustomUserTest(TestCase):
+class CustomUserModelTest(TestCase):
     def setUp(self):
         self.user1 = CustomUser.objects.create_user(
             username='ana', email='ana@email.com', password='GoodMorning#123'
